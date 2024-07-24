@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.goods.dao.SupplierDao">
+	<resultMap type="com.shop.table.vo.SupInfoVO" id="supMap">
+		<result property="supplierCd" 		column="SUPPLIER_CD" />
+		<result property="supplierName" 	column="SUPPLIER_NAME" />
+		<result property="supplierCeo" 		column="SUPPLIER_CEO" />
+		<result property="phone" 			column="PHONE" />
+		<result property="opName" 			column="OP_NAME" />
+		<result property="opPhone" 			column="OP_PHONE" />
+		<result property="opEmail" 			column="OP_EMAIL" />
+		<result property="supplierStatus" 	column="SUPPLIER_STATUS" />
+		<result property="regDt" 			column="REG_DT" />
+	</resultMap>
+
+	<select id="selectSupList" resultMap="supMap">
+		SELECT SUPPLIER_NAME, SUPPLIER_CD
+		FROM TB_SUPPLIER_INFO
+	</select>
+
+
+</mapper>

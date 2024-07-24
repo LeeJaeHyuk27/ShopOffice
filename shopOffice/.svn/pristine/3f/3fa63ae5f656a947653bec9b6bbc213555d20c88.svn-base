@@ -1,0 +1,21 @@
+package com.shop.goods.service;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.shop.goods.dao.SupplierDao;
+import com.shop.table.vo.SupInfoVO;
+
+@Service
+public class SupplierService {
+
+	@Autowired
+	SupplierDao dao;
+	
+	public ArrayList<SupInfoVO> selectSupList(SupInfoVO vo)throws Exception{
+		return dao.selectSupList(vo);
+	}
+	
+}

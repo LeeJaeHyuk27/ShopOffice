@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.order.dao.OrderDao">
+	<resultMap type="com.shop.table.vo.OrderInfoVO" id="orderMap">
+		<result property="orderNo" 			column="ORDER_NO" />
+		<result property="userId" 			column="USER_ID" />
+		<result property="orderGoodsName" 	column="ORDER_GOODS_NAME" />
+		<result property="orderPrice" 		column="ORDER_PRICE" />
+		<result property="orderStatus" 		column="ORDER_STATUS" />
+		<result property="orderDt" 			column="ORDER_DT" />
+		<result property="receiveName" 		column="RECEIVE_NAME" />
+		<result property="zipcd" 			column="ZIPCD" />
+		<result property="addr" 			column="ADDR" />
+		<result property="addrDtl" 			column="ADDR_DTL" />
+		<result property="memo" 			column="MEMO" />
+		<result property="regDt" 			column="REG_DT" />
+		<result property="payment" 			column="PAYMENT" />
+		<result property="buyQty" 			column="BUY_QTY" />
+		<result property="goodsCd" 			column="GOODS_CD" />
+		<result property="unitPrice" 		column="UNIT_PRICE" />
+		<result property="userName" 		column="USER_NAME" />
+	</resultMap>
+
+	<select id="selectOrderList" resultMap="orderMap">
+		SELECT A.ORDER_NO, A.USER_ID, B.USER_NAME, A.ORDER_GOODS_NAME, A.ORDER_PRICE, A.PAYMENT, A.ORDER_STATUS, A.ORDER_DT
+		FROM TB_ORDER_INFO A,
+		(
+		SELECT USER_ID, USER_NAME
+		FROM TB_USER_INFO
+		WHERE USER_NAME like '%'||#{userName}||'%'
+		)B
+		WHERE A.USER_ID = B.USER_ID
+		<if test="orderStatus != null and orderStatus != ''">
+		and ORDER_STATUS = #{orderStatus}
+		</if>
+		<if test="payment != null and payment != ''">
+		and PAYMENT = #{payment}
+		</if>
+		<if test="orderDtFrom != null and orderDtFrom != ''">
+		AND TO_CHAR(ORDER_DT, 'YYYY-MM-DD') <![CDATA[ >= ]]> #{orderDtFrom}
+		</if>
+		<if test="orderDtTo != null and orderDtTo != ''">
+		 AND TO_CHAR(ORDER_DT, 'YYYY-MM-DD') <![CDATA[ <= ]]> #{orderDtTo} 
+		</if>
+	</select>
+
+
+</mapper>

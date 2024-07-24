@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.main.dao.MainDao">
+	<resultMap type="com.shop.table.vo.MainVO" id="mainMap">
+		<result property="userCount" 		column="USER_COUNT" />
+		<result property="goodsCount" 		column="GOODS_COUNT" />
+		<result property="supplierCount" 	column="SUPPLIER_COUNT" />
+		<result property="orderCount" 		column="ORDER_COUNT" />
+		<result property="statusLv1" 		column="STATUSLV1" />
+		<result property="statusLv2" 		column="STATUSLV2" />
+		<result property="statusLv3" 		column="STATUSLV3" />
+		<result property="statusLv4" 		column="STATUSLV4" />
+		<result property="price" 			column="PRICE" />
+		<result property="price" 			column="PRICE" />
+	</resultMap>
+
+	<select id="dashboardInfo" resultMap="mainMap">
+		SELECT USER_COUNT, GOODS_COUNT, SUPPLIER_COUNT, ORDER_COUNT, STATUSLV1, STATUSLV2, STATUSLV3, STATUSLV4
+		FROM
+		(
+		SELECT COUNT(USER_ID) USER_COUNT
+		FROM TB_USER_INFO
+		WHERE WITHDRAW_YN = 'N'
+		),
+		(
+		SELECT COUNT(GOODS_CD) GOODS_COUNT
+		FROM TB_GOODS_INFO
+		),
+		(
+		SELECT COUNT(SUPPLIER_CD) SUPPLIER_COUNT
+		FROM TB_SUPPLIER_INFO
+		),
+		(
+		SELECT COUNT(ORDER_NO) ORDER_COUNT
+		FROM TB_ORDER_INFO
+		WHERE ORDER_DT = SYSDATE
+		),
+		(SELECT COUNT(ORDER_STATUS) STATUSLV1
+		FROM TB_ORDER_INFO
+		WHERE ORDER_STATUS = '결제완료'
+		AND ORDER_DT BETWEEN TO_CHAR(SYSDATE-7, 'YY/MM/DD') AND TO_CHAR(SYSDATE, 'YY/MM/DD')),
+		(SELECT COUNT(ORDER_STATUS) STATUSLV2
+		FROM TB_ORDER_INFO
+		WHERE ORDER_STATUS = '배송준비중'
+		AND ORDER_DT BETWEEN TO_CHAR(SYSDATE-7, 'YY/MM/DD') AND TO_CHAR(SYSDATE, 'YY/MM/DD')),
+		(SELECT COUNT(ORDER_STATUS) STATUSLV3
+		FROM TB_ORDER_INFO
+		WHERE ORDER_STATUS = '배송중'
+		AND ORDER_DT BETWEEN TO_CHAR(SYSDATE-7, 'YY/MM/DD') AND TO_CHAR(SYSDATE, 'YY/MM/DD')),
+		(SELECT COUNT(ORDER_STATUS) STATUSLV4
+		FROM TB_ORDER_INFO
+		WHERE ORDER_STATUS = '배송완료'
+		AND ORDER_DT BETWEEN TO_CHAR(SYSDATE-7, 'YY/MM/DD') AND TO_CHAR(SYSDATE, 'YY/MM/DD'))
+	</select>
+	<select id="salesChart" resultMap="mainMap">
+		WITH all_dates AS (
+		SELECT TRUNC(SYSDATE) - LEVEL + 1 AS dt
+		FROM DUAL
+		CONNECT BY LEVEL <![CDATA[<=]]> 31
+		)
+		SELECT TO_CHAR(ad.dt, 'YYYYMMDD') AS MMDD,
+		NVL(SUM(oi.ORDER_PRICE), 0) AS PRICE
+		FROM all_dates ad
+		LEFT JOIN TB_ORDER_INFO oi
+		ON TRUNC(oi.ORDER_DT) = ad.dt
+		WHERE ad.dt BETWEEN TRUNC(SYSDATE) - 31 AND TRUNC(SYSDATE)
+		GROUP BY TO_CHAR(ad.dt, 'YYYYMMDD')
+		ORDER BY TO_CHAR(ad.dt, 'YYYYMMDD')
+	</select>
+	<select id="orderChart" resultMap="mainMap">
+		WITH all_dates AS (
+  		SELECT TRUNC(SYSDATE) - LEVEL + 1 AS dt
+    	FROM DUAL
+ 		CONNECT BY LEVEL <![CDATA[<=]]> 31
+		)
+		SELECT A.dt AS ORDER_DT,
+       	NVL(COUNT(B.ORDER_NO), 0) AS ORDER_COUNT
+  		FROM all_dates A
+  		LEFT JOIN TB_ORDER_INFO B
+    	ON TRUNC(B.ORDER_DT) = A.dt
+ 		WHERE A.dt BETWEEN TRUNC(SYSDATE) - 31 AND TRUNC(SYSDATE)
+ 		GROUP BY A.dt
+ 		ORDER BY A.dt
+	</select>
+</mapper>

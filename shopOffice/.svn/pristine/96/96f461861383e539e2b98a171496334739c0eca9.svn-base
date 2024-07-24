@@ -1,0 +1,28 @@
+package com.shop.goods.controller;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shop.goods.service.SupplierService;
+import com.shop.table.vo.SupInfoVO;
+
+@Controller
+public class SupplierController {
+
+	@Autowired
+	SupplierService service;
+	
+	@RequestMapping("/goods/getSupplierList")
+	@ResponseBody
+	public ArrayList<SupInfoVO> getSupplierList(@ModelAttribute SupInfoVO vo) throws Exception {
+		
+		ArrayList<SupInfoVO> list = service.selectSupList(vo);
+		
+		return list;
+	}
+}

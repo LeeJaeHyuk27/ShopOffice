@@ -1,0 +1,82 @@
+package com.shop.table.vo;
+
+public class Pagination {
+	private int currentPageNo; //현재 페이지 번호
+	private int perPageNum; //한 페이지당 게시되는 게시물 수
+	private int pageSize; //페이지 리스트에 게시되는 페이지 수
+	private int totalRecordCount; //전체 게시물 수
+	private int firstPageNum; //페이지 리스트의 첫 페이지 번호
+	private int lastPageNum; //페이지 리스트의 마지막 페이지 번호
+    private int rowStart; // 페이지 한 행의 첫번째 게시물 rowNum
+    private int rowEnd; // 페이지 한 행의 마지막 게시물 rowNum
+	private boolean prev; //이전버튼
+	private boolean next; //다음버튼
+	
+	
+	public int getCurrentPageNo() {
+		return currentPageNo;
+	}
+	public void setCurrentPageNo(int currentPageNo) {
+		this.currentPageNo = currentPageNo;
+	}
+	public int getPerPageNum() {
+		return perPageNum;
+	}
+	public void setPerPageNum(int perPageNum) {
+		this.perPageNum = perPageNum;
+	}
+	public int getPageSize() {
+		return pageSize;
+	}
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+	public int getTotalRecordCount() {
+		return totalRecordCount;
+	}
+	public void setTotalRecordCount(int totalRecordCount) {
+		this.totalRecordCount = totalRecordCount;
+	}
+	public int getFirstPageNum() {
+		return firstPageNum;
+	}
+	public void setFirstPageNum(int firstPageNum) {
+		this.firstPageNum = firstPageNum;
+	}
+	public int getLastPageNum() {
+		return lastPageNum;
+	}
+	public void setLastPageNum(int lastPageNum) {
+		this.lastPageNum = lastPageNum;
+	}
+	public int getRowStart() {
+		return rowStart;
+	}
+	public void setRowStart(int rowStart) {
+		this.rowStart = rowStart;
+	}
+	public int getRowEnd() {
+		return rowEnd;
+	}
+	public void setRowEnd(int rowEnd) {
+		this.rowEnd = rowEnd;
+	}
+	public boolean isPrev() {
+		return prev;
+	}
+	public void setPrev(boolean prev) {
+		this.prev = prev;
+	}
+	public boolean isNext() {
+		return next;
+	}
+	public void setNext(boolean next) {
+		this.next = next;
+	}
+	
+
+
+
+        
+
+}

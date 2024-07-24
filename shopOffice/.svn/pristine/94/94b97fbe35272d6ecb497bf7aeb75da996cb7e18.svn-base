@@ -1,0 +1,58 @@
+package com.shop.user.controller;
+
+import java.util.ArrayList;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shop.table.vo.BoardInfoVO;
+import com.shop.user.service.BoardService;
+
+
+
+@Controller
+public class BoardController {
+
+	@Autowired
+	BoardService service;
+	
+	// 회원문의 페이지
+	@RequestMapping("/user/board")
+	public String board() throws Exception{
+		return "user/board";
+	}
+	// 문의 조회
+	@RequestMapping("/user/getBoardList")
+	@ResponseBody
+	public ArrayList<BoardInfoVO> getBoardList(@ModelAttribute BoardInfoVO vo) throws Exception{
+		
+		ArrayList<BoardInfoVO> list = service.selectBoardList(vo);
+		
+		return list;
+	}
+	
+	// 문의 상세조회
+	@RequestMapping("/user/getBoardDtl")
+	@ResponseBody
+	public BoardInfoVO getBoardDtl(@ModelAttribute ("BoardInfoVO")BoardInfoVO vo) throws Exception {
+		
+		vo = service.selectBoardDtl(vo);
+		
+		return vo;
+	}
+	// 답변 등록하기
+	@RequestMapping("/user/reply")
+	@ResponseBody
+	public int reply(@ModelAttribute("BoardInfoVO")BoardInfoVO vo) throws Exception {
+		
+		int cnt = service.updateReply(vo);
+		
+		return cnt;
+	}
+	
+	
+}

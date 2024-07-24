@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>회원상세</title>
+<script src="/Workspace/Java/shopOffice/src/main/webapp/assets/js/jquery-3.7.1.js"></script>
+</head>
+<body>
+    <div class="modal fade" id="memberInfo" tabindex="-1">
+       <div class="modal-dialog modal-xl modal-dialog-centered">
+         <div class="modal-content">
+           <div class="modal-header">
+           	
+             <h5 class="modal-title">회원상세</h5>
+           </div>
+           <div class="modal-body">
+             <table border='1' class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">회원ID</th>
+                    <th scope="col">회원명</th>
+                    <th scope="col">이메일</th>
+                    <th scope="col">연락처</th>
+                    <th scope="col">주소</th>
+                    <th scope="col">가입일</th>
+                    <th scope="col">탈퇴여부</th>
+                    <th scope="col">탈퇴일</th>
+                    <th scope="col">주문횟수</th>
+                    <th scope="col">주문금액</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyDt">
+              	</tbody>
+              </table>
+              <table border='1' class="table table-hover">
+                <thead>
+                <tr>
+                	<td>주문이력</td>
+                </tr>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">주문번호</th>
+                    <th scope="col">주문상품명</th>
+                    <th scope="col">상품수량</th>
+                    <th scope="col">주문금액</th>
+                    <th scope="col">수취인</th>
+                    <th scope="col">배송지</th>
+                    <th scope="col">배송상태</th>
+                    <th scope="col">주문서보기</th>
+                  </tr>
+                </thead>
+                <tbody id="orderDtl">
+              	</tbody>
+              </table>
+           </div>
+           <div class="modal-footer">
+             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+           </div>
+           
+         </div>
+       </div>
+     </div><!-- End Vertically centered Modal-->
+</body>
+<style>
+.table {
+    margin: 20px;
+</style>
+<script>
+	$(function() {
+		str = "<tr onclick=\"memberDetail();\" style=\"cursor:pointer;\">";
+		var list = ['TEST1', "홍길동", "010-1234-1234", "(11111)경기도 의정부시 한국로 12번길", "test@mail.com", "2024.03.02", "N", "-", "2", "100,000"];
+		for(var i = 0; i < list.length; i++){
+			str += "<td style=\"text-align:center\" >"+list[i]+"</td>";
+		}
+		str += "</tr>";
+		$('#tbodyDt').append(str);
+		var str = "<tr>";
+		var list1 = ['1', '202404001', '반팔티셔츠 외 3건', '10', '100,000', '홍길동', '서울', '배송중'];
+		for(var i = 0; i < list1.length; i++){
+			str += "<td style=\"text-align:center\" >"+list1[i]+"</td>";
+		}
+		str += "<td><button type=\"button\">보기</button></td>";
+		str += "</tr>";
+		$('#orderDtl').append(str);
+	});
+
+</script>
+</html>

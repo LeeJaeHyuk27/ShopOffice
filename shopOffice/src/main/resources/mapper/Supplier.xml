@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.sup.dao.SupplierDao">
+	<resultMap type="com.shop.table.vo.SupInfoVO" id="supMap">
+		<result property="supplierCd" 		column="SUPPLIER_CD" />
+		<result property="supplierName" 	column="SUPPLIER_NAME" />
+		<result property="supplierCeo" 		column="SUPPLIER_CEO" />
+		<result property="phone" 			column="PHONE" />
+		<result property="opName" 			column="OP_NAME" />
+		<result property="opPhone" 			column="OP_PHONE" />
+		<result property="opEmail" 			column="OP_EMAIL" />
+		<result property="supplierStatus" 	column="SUPPLIER_STATUS" />
+		<result property="regDt" 			column="REG_DT" />
+	</resultMap>
+	<select id="selectTotalSupCount" resultType="integer">
+		SELECT COUNT(*)
+		FROM TB_SUPPLIER_INFO
+		WHERE 1=1
+		<if test="supplierName != null and supplierName != ''">
+		and SUPPLIER_NAME like '%'||#{supplierName}||'%'
+		</if>
+		<if test="supplierStatus != null and supplierStatus != ''">
+		and SUPPLIER_STATUS = #{supplierStatus}
+		</if>
+	</select>
+	<select id="selectSupNameList" resultMap="supMap">
+		SELECT SUPPLIER_NAME, SUPPLIER_CD
+		FROM TB_SUPPLIER_INFO
+	</select>
+	<select id="selectSupList" resultMap="supMap">
+		SELECT A.SUPPLIER_CD, A.SUPPLIER_NAME, A.SUPPLIER_CEO, A.PHONE, A.OP_NAME, A.OP_PHONE, A.OP_EMAIL, A.SUPPLIER_STATUS, A.REG_DT
+		FROM(
+		SELECT ROWNUM RN, SUPPLIER_CD, SUPPLIER_NAME, SUPPLIER_CEO, PHONE, OP_NAME, OP_PHONE, OP_EMAIL, SUPPLIER_STATUS, REG_DT
+		FROM TB_SUPPLIER_INFO
+		WHERE 1=1
+		<if test="supplierName != null and supplierName != ''">
+		and SUPPLIER_NAME like '%'||#{supplierName}||'%'
+		</if>
+		<if test="supplierStatus != null and supplierStatus != ''">
+		and SUPPLIER_STATUS = #{supplierStatus}
+		</if>
+		)A
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	</select>
+	<select id="selectSupDtl" resultMap="supMap">
+		SELECT SUPPLIER_CD, SUPPLIER_NAME, SUPPLIER_CEO, PHONE, OP_NAME, OP_PHONE, OP_EMAIL, SUPPLIER_STATUS
+		FROM TB_SUPPLIER_INFO
+		WHERE SUPPLIER_CD = #{supplierCd}
+	</select>
+	<update id="updateSupplier">
+		UPDATE TB_SUPPLIER_INFO
+		SET SUPPLIER_NAME = #{supplierName}, SUPPLIER_CEO = #{supplierCeo}, PHONE = #{phone}, OP_NAME = #{opName}, OP_PHONE = #{opPhone}
+		, OP_EMAIL = #{opEmail}||'@'||#{email}, SUPPLIER_STATUS = #{supplierStatus}, REG_DT = SYSDATE
+		WHERE SUPPLIER_CD = #{supplierCd}
+	</update>
+	<insert id="insertSupplier">
+		INSERT INTO TB_SUPPLIER_INFO(SUPPLIER_CD, SUPPLIER_NAME, SUPPLIER_CEO, PHONE, OP_NAME, OP_PHONE, OP_EMAIL, SUPPLIER_STATUS, REG_DT)
+		SELECT SUPPLIER_CD, #{supplierName}, #{supplierCeo}, #{phone}, #{opName}, #{opPhone}, #{opEmail}||'@'||#{email}, #{supplierStatus} , SYSDATE
+		FROM (
+        SELECT 
+        REPLACE('SUP'||TO_CHAR (SUBSTR(MAX(SUPPLIER_CD), 4, 2)+1, '00'), ' ', '')SUPPLIER_CD
+        FROM TB_SUPPLIER_INFO
+		WHERE 1=1
+		) SUPPLIER_CD
+	</insert>
+	<resultMap type="com.shop.table.vo.SupOrderVO" id="supOrderMap">
+		<result property="orderNo" 			column="ORDER_NO" />
+		<result property="supplierNo" 		column="SUPPLIER_NO" />
+		<result property="orderPrice" 		column="ORDER_PRICE" />
+		<result property="orderStatus"	 	column="ORDER_STATUS" />
+		<result property="incomeDt" 		column="INCOME_DT" />
+		<result property="regDt" 			column="REG_DT" />
+		<result property="supplierCd" 		column="SUPPLIER_CD" />
+		<result property="supplierName" 	column="SUPPLIER_NAME" />
+		<result property="goodsCd" 			column="GOODS_CD" />
+		<result property="goodsName" 		column="GOODS_NAME" />
+		<result property="buyQty" 			column="BUY_QTY" />
+		<result property="unitPrice" 		column="UNIT_PRICE" />
+	</resultMap>
+	<select id="selectTotalSupOrderCount" resultType="integer">
+		SELECT COUNT(*)
+		FROM TB_SUPPLIER_ORDER A,
+		(
+		SELECT ORDER_NO, GOODS_CD, BUY_QTY, UNIT_PRICE
+		FROM TB_SUPPLIER_GOODS
+		)B,
+		(
+		SELECT SUPPLIER_CD, SUPPLIER_NAME
+		FROM TB_SUPPLIER_INFO
+		)C,
+		(
+		SELECT GOODS_CD, GOODS_NAME
+		FROM TB_GOODS_INFO
+		)D
+		WHERE A.ORDER_NO = B.ORDER_NO
+		AND A.SUPPLIER_CD = C.SUPPLIER_CD
+		AND B.GOODS_CD = D.GOODS_CD
+		ORDER BY INCOME_DT DESC
+		<if test="supplierName != null and supplierName != ''">
+		and SUPPLIER_NAME like '%'||#{supplierName}||'%'
+		</if>
+		<if test="incomeDtFrom != null and incomeDtFrom != ''">
+		AND TO_CHAR(INCOME_DT, 'YYYY-MM-DD') <![CDATA[ >= ]]> #{incomeDtFrom}
+		</if>
+		<if test="incomeDtTo != null and incomeDtTo != ''">
+		 AND TO_CHAR(INCOME_DT, 'YYYY-MM-DD') <![CDATA[ <= ]]> #{incomeDtTo} 
+		</if>
+	</select>
+	<select id="selectSupOrderList" resultMap="supOrderMap">
+		SELECT E.SUPPLIER_CD, E.SUPPLIER_NAME, E.ORDER_NO, E.INCOME_DT, E.GOODS_CD, E.GOODS_NAME, E.BUY_QTY, E.UNIT_PRICE, E.ORDER_STATUS, E.REG_DT 
+		FROM(
+		SELECT ROWNUM RN, A.SUPPLIER_CD, C.SUPPLIER_NAME, A.ORDER_NO, A.INCOME_DT, B.GOODS_CD, D.GOODS_NAME, B.BUY_QTY, B.UNIT_PRICE, A.ORDER_STATUS, A.REG_DT 
+		FROM TB_SUPPLIER_ORDER A,
+		(
+		SELECT ORDER_NO, GOODS_CD, BUY_QTY, UNIT_PRICE
+		FROM TB_SUPPLIER_GOODS
+		)B,
+		(
+		SELECT SUPPLIER_CD, SUPPLIER_NAME
+		FROM TB_SUPPLIER_INFO
+		)C,
+		(
+		SELECT GOODS_CD, GOODS_NAME
+		FROM TB_GOODS_INFO
+		)D
+		WHERE A.ORDER_NO = B.ORDER_NO
+		AND A.SUPPLIER_CD = C.SUPPLIER_CD
+		AND B.GOODS_CD = D.GOODS_CD
+		ORDER BY INCOME_DT DESC
+		<if test="supplierName != null and supplierName != ''">
+		and SUPPLIER_NAME like '%'||#{supplierName}||'%'
+		</if>
+		<if test="incomeDtFrom != null and incomeDtFrom != ''">
+		AND TO_CHAR(INCOME_DT, 'YYYY-MM-DD') <![CDATA[ >= ]]> #{incomeDtFrom}
+		</if>
+		<if test="incomeDtTo != null and incomeDtTo != ''">
+		 AND TO_CHAR(INCOME_DT, 'YYYY-MM-DD') <![CDATA[ <= ]]> #{incomeDtTo} 
+		</if>
+		)E
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	</select>
+	<select id="selectSupOrderDtl" resultMap="supOrderMap">
+		SELECT C.GOODS_CD, C.GOODS_NAME, B.UNIT_PRICE, B.BUY_QTY
+		FROM TB_SUPPLIER_ORDER A,
+		(
+		SELECT ORDER_NO, GOODS_CD, UNIT_PRICE, BUY_QTY
+		FROM TB_SUPPLIER_GOODS
+		) B,
+		(
+		SELECT GOODS_CD, GOODS_NAME
+		FROM TB_GOODS_INFO
+		) C
+		WHERE A.SUPPLIER_CD = #{supplierCd}
+		AND A.ORDER_NO = B.ORDER_NO
+		AND B.GOODS_CD = C.GOODS_CD
+	</select>
+	<insert id="insertSupOrder">
+		INSERT ALL 
+    	INTO TB_SUPPLIER_GOODS(ORDER_NO, GOODS_CD, UNIT_PRICE, BUY_QTY)
+    	VALUES(ORDER_NO, #{goodsCd}, #{unitPrice}, #{buyQty})
+    	INTO TB_SUPPLIER_ORDER(ORDER_NO, SUPPLIER_CD, ORDER_PRICE, ORDER_STATUS, INCOME_DT)
+    	VALUES(ORDER_NO, #{supplierName}, #{unitPrice}*#{buyQty}, '입고대기중', SYSDATE)
+    	SELECT ORDER_NO
+    	FROM (
+    	SELECT 
+    	REPLACE(TO_CHAR(SYSDATE, 'YYMM')||TO_CHAR (SUBSTR(MAX(ORDER_NO), 5, 2)+1, '00'), ' ', '')ORDER_NO
+    	FROM TB_SUPPLIER_GOODS
+    	WHERE 1=1
+    	) ORDER_NO
+	</insert>
+	<select id="selectWeekSupOrder" resultMap="supOrderMap">
+		SELECT A.ORDER_NO, B.SUPPLIER_NAME, C.GOODS_NAME, A.ORDER_PRICE, A.ORDER_STATUS
+		FROM TB_SUPPLIER_ORDER A,
+		(
+		SELECT SUPPLIER_CD, SUPPLIER_NAME
+		FROM TB_SUPPLIER_INFO
+		)B,
+		(
+		SELECT GOODS_CD, GOODS_NAME
+		FROM TB_GOODS_INFO
+		)C,
+		(
+		SELECT GOODS_CD, ORDER_NO
+		FROM TB_SUPPLIER_GOODS
+		)D
+		WHERE A.SUPPLIER_CD = B.SUPPLIER_CD
+		AND A.ORDER_NO = D.ORDER_NO
+		AND C.GOODS_CD = D.GOODS_CD
+	</select>
+</mapper>

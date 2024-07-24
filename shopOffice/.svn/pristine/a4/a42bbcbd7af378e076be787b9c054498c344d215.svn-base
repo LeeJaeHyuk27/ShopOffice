@@ -1,0 +1,50 @@
+package com.shop.user.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shop.table.vo.OrderInfoVO;
+import com.shop.table.vo.UserInfoVO;
+import com.shop.user.service.UserService;
+
+@Controller
+
+public class UserController {
+
+	@Autowired
+	UserService service;
+	
+	@RequestMapping("/user/list")
+	public String list() throws Exception {
+		return "user/list";
+	}
+	
+	// 회원 조회하기
+	@RequestMapping("/user/getlist")
+	@ResponseBody
+	public ArrayList<UserInfoVO> getUserList(@ModelAttribute UserInfoVO vo) throws Exception  {
+		
+		ArrayList<UserInfoVO> list = service.selectUserList(vo);
+		
+		return list;
+	}
+	// 회원 상세조회
+	@RequestMapping("/user/memberDetail")
+	@ResponseBody
+	public UserInfoVO getUserDetail(@ModelAttribute ("UserInfoVO") UserInfoVO vo) throws Exception  {
+		
+		vo = service.selectUserDetail(vo);
+		
+		List<OrderInfoVO> list = service.selectOrderList(vo);
+		
+		vo.setOrderlist(list);
+		
+		return vo;
+	}
+}

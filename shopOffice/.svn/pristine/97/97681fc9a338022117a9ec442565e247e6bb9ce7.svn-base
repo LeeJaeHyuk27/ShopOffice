@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.goods.dao.GoodsDao">
+	<resultMap type="com.shop.table.vo.GoodsInfoVO" id="goodsMap">
+		<result property="goodsCd" 			column="GOODS_CD" />
+		<result property="ctCd" 			column="CT_CD" />
+		<result property="goodsName" 		column="GOODS_NAME" />
+		<result property="normalPrice" 		column="NORMAL_PRICE" />
+		<result property="sellPrice" 		column="SELL_PRICE" />
+		<result property="ivQty" 			column="IV_QTY" />
+		<result property="goodsStatus" 		column="GOODS_STATUS" />
+		<result property="supplierCd" 		column="SUPPLIER_CD" />
+		<result property="thumbnailUrl" 	column="THUMBNAIL_URL" />
+		<result property="content" 			column="CONTENT" />
+		<result property="regDt" 			column="REG_DT" />
+		<result property="ctName" 			column="CT_NAME" />
+		<result property="upCtCd" 			column="UP_CT_CD" />
+	</resultMap>
+
+	<select id="selectGoodsList" resultMap="goodsMap">
+		SELECT A.GOODS_CD, A.GOODS_NAME, C.CT_NAME, A.SELL_PRICE, A.IV_QTY, A.REG_DT, A.GOODS_STATUS
+		FROM TB_GOODS_INFO A, 
+		(
+		SELECT SUPPLIER_CD, SUPPLIER_NAME
+		FROM TB_SUPPLIER_INFO
+		) B,
+		(
+		SELECT CT_NAME,CT_CD
+		FROM TB_GOODS_CATEGORY
+		<if test="ctCd != null and ctCd != ''">
+		WHERE CT_CD LIKE '%'||#{ctCd}||'%'
+		</if>
+		)C
+		WHERE A.SUPPLIER_CD = B.SUPPLIER_CD
+		and A.CT_CD = C.CT_CD
+		<if test="goodsName != null and goodsName != ''">
+		and A.GOODS_NAME LIKE '%'||#{goodsName}||'%'
+		</if>
+		<if test="goodsStatus != null and goodsStatus != ''">
+		and A.GOODS_STATUS = #{goodsStatus}
+		</if>
+		<if test="supplierCd != null and supplierCd != ''">
+		and A.SUPPLIER_CD = #{supplierCd}
+		</if>
+		<if test="ctCd != null and ctCd != ''">
+		and A.CT_CD LIKE '%'||#{ctCd}||'%'
+		</if>
+	</select>
+	<select id="selectGoodsDtl" resultMap="goodsMap">
+		SELECT GOODS_CD, GOODS_NAME, NORMAL_PRICE, SELL_PRICE, IV_QTY, GOODS_STATUS, SUPPLIER_CD, CT_CD, THUMBNAIL_URL, CONTENT
+		FROM TB_GOODS_INFO
+		WHERE GOODS_CD = #{goodsCd}
+	</select>
+	<insert id="insertGoods">
+		INSERT INTO TB_GOODS_INFO(GOODS_CD, GOODS_NAME, NORMAL_PRICE, SELL_PRICE, IV_QTY, GOODS_STATUS, SUPPLIER_CD, CT_CD, CONTENT, REG_DT)
+		SELECT GOODS_CD, #{goodsName}, #{normalPrice}, #{sellPrice}, #{ivQty}, #{goodsStatus}, #{supplierCd}, #{ctCd}, #{content} , SYSDATE
+		FROM (
+		SELECT
+		REPLACE('G'||TO_CHAR(SUBSTR(MAX(GOODS_CD), 2)+1, '00'), ' ', '') GOODS_CD
+		FROM TB_GOODS_INFO
+		WHERE 1=1
+		) GOODS_CD
+	</insert>
+	<update id="updateGoods">
+		UPDATE TB_GOODS_INFO
+		SET GOODS_NAME = #{goodsName}, NORMAL_PRICE = #{normalPrice}, SELL_PRICE = #{sellPrice}, IV_QTY = #{ivQty}, GOODS_STATUS = #{goodsStatus}, 
+		SUPPLIER_CD = #{supplierCd}, CONTENT = #{content} , REG_DT = SYSDATE, CT_CD = #{ctCd}
+		WHERE GOODS_CD = #{goodsCd}
+	</update>
+	
+	<resultMap type="com.shop.table.vo.CategoryVO" id="CtMap">
+		<result property="ctCd" 		column="CT_CD" />
+		<result property="ctName" 		column="CT_NAME" />
+		<result property="ctLevel" 		column="CT_LEVEL" />
+		<result property="upCtCd" 		column="UP_CT_CD" />
+		<result property="regDt" 		column="REG_DT" />
+	</resultMap>
+	
+	<select id = "selectCtLv1List" resultMap="CtMap">
+		SELECT CT_NAME
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '1'
+		AND CT_CD = 'A1'
+	</select>
+	
+	<select id = "selectCtLv2List" resultMap="CtMap">
+		SELECT CT_NAME
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '2'
+		AND UP_CT_CD = 'A1'
+	</select>
+	
+	<select id = "selectCtLv3List" resultMap="CtMap">
+		SELECT CT_NAME
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '3'
+		AND UP_CT_CD = 'A101'
+	</select>
+	
+	
+</mapper>

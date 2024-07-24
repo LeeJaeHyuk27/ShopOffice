@@ -1,0 +1,13 @@
+package com.shop.goods.dao;
+
+import java.util.ArrayList;
+
+import org.mybatis.spring.annotation.MapperScan;
+
+import com.shop.table.vo.SupInfoVO;
+
+@MapperScan(basePackages="com.shop.goods.dao")
+public interface SupplierDao {
+
+	public ArrayList<SupInfoVO> selectSupList(SupInfoVO vo)throws Exception;
+}

@@ -1,0 +1,33 @@
+package com.shop.order.controller;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.shop.order.service.OrderService;
+import com.shop.table.vo.OrderInfoVO;
+
+@Controller
+public class OrderController {
+
+	@Autowired
+	OrderService service;
+	
+	@RequestMapping("/order/order")
+	public String order() throws Exception{
+		return "/order/order";
+	}
+	// 주문 조회
+	@RequestMapping("/order/getOrderList")
+	@ResponseBody
+	public ArrayList<OrderInfoVO> selectOrderList(@ModelAttribute OrderInfoVO vo)throws Exception{
+		
+		ArrayList<OrderInfoVO> list = service.selectOrderList(vo);
+		
+		return list;
+	}
+}

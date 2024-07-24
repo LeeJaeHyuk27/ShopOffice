@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.system.dao.ManageDao">
+	<resultMap type="com.shop.table.vo.ManagerInfoVO" id="manageMap">
+		<result property="manageId" 	column="MANAGE_ID" />
+		<result property="manageName" 	column="MANAGE_NAME" />
+		<result property="managePwd" 	column="MANAGE_PWD" />
+		<result property="email" 		column="EMAIL" />
+		<result property="phone" 		column="PHONE" />
+		<result property="leaveYn" 		column="LEAVE_YN" />
+		<result property="regDt" 		column="REG_DT" />
+		<result property="updDt" 		column="UPD_DT" />
+	</resultMap>
+	<select id="selectTotalManagerCount" resultType="integer">
+		SELECT COUNT(*)
+		FROM TB_MANAGE_INFO
+		WHERE 1=1
+		<if test="manageName != null and manageName != ''">
+		AND MANAGE_NAME LIKE '%'||#{manageName}||'%'
+		</if>
+		<if test="leaveYn != null and leaveYn != ''">
+		AND LEAVE_YN = #{leaveYn}
+		</if>
+	</select>
+	<select id="selectManagerList" resultMap="manageMap">
+		SELECT A.MANAGE_ID, A.MANAGE_NAME, A.EMAIL, A.PHONE, A.REG_DT, A.LEAVE_YN
+		FROM (
+		SELECT ROWNUM RN, MANAGE_ID, MANAGE_NAME, EMAIL, PHONE, REG_DT, LEAVE_YN
+		FROM TB_MANAGE_INFO
+		WHERE 1=1
+		<if test="manageName != null and manageName != ''">
+		AND MANAGE_NAME LIKE '%'||#{manageName}||'%'
+		</if>
+		<if test="leaveYn != null and leaveYn != ''">
+		AND LEAVE_YN = #{leaveYn}
+		</if>
+		)A
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	</select>
+	<select id="selectManagerDtl" resultMap="manageMap">
+		SELECT MANAGE_ID, MANAGE_NAME, MANAGE_PWD, EMAIL, PHONE, LEAVE_YN
+		FROM TB_MANAGE_INFO
+		WHERE MANAGE_ID = #{manageId}
+	</select>
+	<update id="saveManager">
+		MERGE INTO TB_MANAGE_INFO A USING dual ON 
+   		(A.MANAGE_ID = #{manageId}
+   		AND MANAGE_PWD = #{managePwd}
+   		)
+ 		WHEN MATCHED THEN
+		UPDATE SET MANAGE_NAME = #{manageName}, EMAIL = #{email}, PHONE = #{phone}, LEAVE_YN = #{leaveYn}, UPD_DT = SYSDATE
+		WHEN NOT MATCHED THEN
+		INSERT (MANAGE_ID, MANAGE_NAME, MANAGE_PWD, EMAIL, PHONE, LEAVE_YN, REG_DT)
+		VALUES (#{manageId}, #{manageName}, #{managePwd}, #{email}, #{phone}, #{leaveYn}, SYSDATE)
+	</update>
+</mapper>

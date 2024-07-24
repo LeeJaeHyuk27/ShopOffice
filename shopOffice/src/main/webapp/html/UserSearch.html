@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>회원조회</title>
+<script src="/Workspace/Java/shopOffice/src/main/webapp/assets/js/jquery-3.7.1.js"></script>
+</head>
+<body>
+	<section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body" style="padding-top: 20px;">
+              <!-- General Form Elements -->
+              <form id="searchform">
+              <input type="hidden" id="currentPage" name="currentPage">
+              <table class="col-lg-12" >
+              	<tr>
+              		<td>
+		              	<div class="row mb-4">
+		                  <label for="inputText" class="col-sm-1 col-form-label">회원명</label>
+		                  <div class="col-sm-2">
+		                    <input type="text" class="form-control" id="userName" name="userName">
+		                  </div>
+		                </div>
+		           <td>
+		           <td rowspan="2">
+		                <div class="row mb-4">
+		                  <label for="inputText" class="col-sm-3 col-form-label">탈퇴여부</label>
+		                  <div class="col-sm-2">
+		                    <select name="withDrawYn" >
+   								<option value=>=== 선택 ===</option>
+   								<option value="Y">Y</option>
+    							<option value="N">N</option>
+    						</select>
+		                  </div>
+		                </div>		
+              		</td>
+              		<td rowspan="2">
+              			<button type="button" class="btn btn-info" onclick = 'usersearch(1);'>조회</button>
+              		</td>
+              	</tr>
+              	<tr>
+              		<td>
+              			<div class="row mb-3">
+		                  <label for="inputDate" class="col-sm-1 col-form-label">가입일</label>
+		                  <div class="col-sm-2">
+		                    <input type="date" class="form-control" id="joinDtFrom" name="joinDtFrom">
+		                  </div>
+		                  ~
+		                  <div class="col-sm-2">
+		                    <input type="date" class="form-control" id="joinDtTo" name="joinDtTo">
+		                  </div>
+		                  
+		                </div>
+              		</td>
+              	</tr>
+              </table>
+                
+                
+                
+              </form>
+              
+            </div>
+          </div>
+           <div class="card">
+            <div class="card-body">
+              <!-- Table with hoverable rows -->
+              <table border="1" class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">회원ID</th>
+                    <th scope="col">회원명</th>
+                    <th scope="col">이메일</th>
+                    <th scope="col">연락처</th>
+                    <th scope="col">가입일</th>
+                    <th scope="col">탈퇴여부</th>
+                    <th scope="col">탈퇴일</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody" >
+                
+                </tbody>
+              </table>
+              <!-- End Table with hoverable rows -->
+			  <nav aria-label="Page navigation example">
+                <ul class="pagination" id="userPaging">
+                </ul>
+              </nav><!-- End Pagination with icons -->
+			   	
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+</body>
+<script>
+	function usersearch(){
+		$('#tbody').empty();
+		str = "<tr onclick=\"memberDetail();\" style=\"cursor:pointer;\">";
+		var list = ['1', 'TEST1', "홍길동", "test@mail.com", "010-1234-1234", "2024.03.02", "N", "-"];
+		for(var i = 0; i < list.length; i++){
+			str += "<td style=\"text-align:center\" >"+list[i]+"</td>";
+		}
+		str += "</tr>";
+		$('#tbody').append(str);
+	}
+	function memberDetail(){
+		location.href="/Workspace/Java/shopOffice/src/main/webapp/WEB-INF/UserDetail";
+	}
+</script>
+</html>

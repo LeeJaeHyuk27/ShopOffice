@@ -1,0 +1,20 @@
+package com.shop.order.service;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.shop.order.dao.OrderDao;
+import com.shop.table.vo.OrderInfoVO;
+
+@Service
+public class OrderService {
+
+	@Autowired
+	OrderDao dao;
+	
+	public ArrayList<OrderInfoVO> selectOrderList(OrderInfoVO vo)throws Exception{
+		return dao.selectOrderList(vo);
+	}
+}

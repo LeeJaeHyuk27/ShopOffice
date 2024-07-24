@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.goods.dao.CategoryDao">
+	<resultMap type="com.shop.table.vo.CategoryVO" id="CtMap">
+		<result property="ctCd" 		column="CT_CD" />
+		<result property="ctName" 		column="CT_NAME" />
+		<result property="ctLevel" 		column="CT_LEVEL" />
+		<result property="upCtCd" 		column="UP_CT_CD" />
+		<result property="regDt" 		column="REG_DT" />
+	</resultMap>
+
+	<select id="getLevel1List" resultMap="CtMap">
+		SELECT CT_CD, CT_NAME, UP_CT_CD
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '1'
+	</select>
+	<select id="getLevel2List" resultMap="CtMap">
+		SELECT CT_CD, CT_NAME, UP_CT_CD
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '2'
+		AND UP_CT_CD = #{upCtCd}
+	</select>
+	<select id="getLevel3List" resultMap="CtMap">
+		SELECT CT_CD, CT_NAME, UP_CT_CD
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = '3'
+		AND UP_CT_CD = #{upCtCd}
+	</select>
+	<select id="getCategory" resultMap="CtMap">
+		SELECT CT_CD, UP_CT_CD,CT_NAME, CT_LEVEL
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_LEVEL = #{ctLevel}
+		<if test="upCtCd!=null and upCtCd!=''">
+		AND UP_CT_CD = #{upCtCd}
+		</if>
+	</select>
+	<select id="getName" resultMap="CtMap">
+		SELECT CT_NAME
+		FROM TB_GOODS_CATEGORY
+		WHERE CT_CD = #{ctCd}
+	</select>
+	<update id="updateCtName">
+		UPDATE TB_GOODS_CATEGORY
+		SET CT_NAME = #{ctName}
+		WHERE CT_CD = #{ctCd}
+	</update>
+	
+	<insert id="insertCt">
+		INSERT INTO TB_GOODS_CATEGORY (CT_CD, CT_NAME, CT_LEVEL, UP_CT_CD, REG_DT)
+		SELECT CT_CD, #{ctName}, #{ctLevel}, #{ctCd}, SYSDATE
+		FROM (
+        SELECT 
+        CASE WHEN CT_LEVEL = 1 THEN REPLACE('A'||TO_CHAR (SUBSTR(MAX(CT_CD), 2)+1), ' ', '')
+        	 WHEN CT_LEVEL = 2 THEN REPLACE(#{ctCd}||TO_CHAR (NVL(SUBSTR(MAX(CT_CD), 3), 0)+1, '00'), ' ', '')
+             WHEN CT_LEVEL = 3 THEN REPLACE(#{ctCd}||TO_CHAR (NVL(SUBSTR(MAX(CT_CD), 5), 0)+1, '00'), ' ', '')
+        END CT_CD
+		FROM TB_GOODS_CATEGORY
+        WHERE CT_LEVEL = #{ctLevel}
+        <if test="ctCd!=null and ctCd!=''">
+        AND UP_CT_CD = #{ctCd}
+        </if>
+        GROUP BY CT_LEVEL
+        UNION ALL
+        SELECT #{ctCd}||'01' CT_CD FROM DUAL
+        )
+        WHERE ROWNUM=1
+	</insert>
+		
+		
+</mapper>
